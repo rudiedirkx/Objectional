@@ -86,7 +86,6 @@ class Object {
 		for ( $i=0; $i<$steps; $i++ ) {
 			$path = dirname($path);
 		}
-		echo $path."\n";
 		if ( strlen($path) < strlen($this->__root) ) {
 			return null;
 		}
@@ -102,6 +101,12 @@ class Object {
 
 	function write() {
 		return file_put_contents($this->__path, serialize($this->data));
+	}
+
+	function __destruct() {
+		if ( $this->unsaved ) {
+			$this->write();
+		}
 	}
 
 	function extend( $object ) {
