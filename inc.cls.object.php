@@ -4,6 +4,7 @@ class Object {
 	public $__path;
 	public $__root;
 	public $data = array();
+	public $unsaved = false;
 	function __construct( $path, $root = false ) {
 		$this->__path = realpath($path);
 		if ( $root ) {
@@ -33,24 +34,39 @@ class Object {
 		return $objects;
 	}
 
-	function get( $k ) {
-		$k = strtolower($k);
-		if ( array_key_exists($k, $this->data) ) {
-			return $this->data[$k];
+	function get( $key, $alt = null ) {
+		if ( array_key_exists($key, $this->data) ) {
+			return $this->data[$key];
 		}
+		return $alt;
+	}
+
+	function set( $key, $value, $write = true ) {
+		$this->data[$key] = $value;
+		if ( $write ) {
+			$this->write();
+			$this->unsaved = false;
+		}
+		else {
+			$this->unsaved = true;
+		}
+		return $this;
+	}
+
+	function object( $id ) {
+		$id = strtolower($id);
 		$dir = $this->dir();
-		$object = glob($dir.'/'.str_replace('.', '/', $k).'.*');
+		$object = glob($dir.'/'.str_replace('.', '/', $id).'.*');
 		if ( $object ) {
 			return new self($object[0], $this->__root);
 		}
-		return false;
+		return null;
 	}
 
 	function create( $id, $type = __CLASS__ ) {
 		$type = __CLASS__;
 		$type = strtolower($type);
-#		if ( glob($this->__path.'/'.strtolower($id).'.*') ) {
-		if ( $this->get($id) ) {
+		if ( $this->object($id) ) {
 			return false;
 		}
 		$dir = $this->dir();
@@ -58,12 +74,34 @@ class Object {
 			mkdir($dir);
 		}
 		$object = strtolower($id.'.'.__CLASS__);
-		file_put_contents($dir.'/'.$object, serialize(array()));
-		return self::__object($dir.'/'.$object, $this->__root);
+		$file = $dir.'/'.$object;
+		file_put_contents($file, serialize(array()));
+		chmod($file, 0777);
+		return self::__object($file, $this->__root);
 	}
 
 	function parent( $steps = 1 ) {
-		
+		$path = $this->__path;
+		$steps = max(1, (int)$steps);
+		for ( $i=0; $i<$steps; $i++ ) {
+			$path = dirname($path);
+		}
+		echo $path."\n";
+		if ( strlen($path) < strlen($this->__root) ) {
+			return null;
+		}
+		if ( strlen($path) == strlen($this->__root) ) {
+			return new self($path);
+		}
+		$object = glob($path.'.*');
+		if ( $object ) {
+			return self::__object($object[0], $this->__root);
+		}
+		return null;
+	}
+
+	function write() {
+		return file_put_contents($this->__path, serialize($this->data));
 	}
 
 	function extend( $object ) {
