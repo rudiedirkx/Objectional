@@ -28,9 +28,13 @@ class Object {
 		return $objects;
 	}
 
-	function getObjectIDs() {
+	function getObjectIDs( $sort = true ) {
 		$objects = glob($this->dir().'/*.*');
 		$objects = array_map(array(__CLASS__, '__id'), $objects);
+		if ( $sort ) {
+			natcasesort($objects);
+			$objects = array_values($objects);
+		}
 		return $objects;
 	}
 

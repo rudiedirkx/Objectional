@@ -8,17 +8,25 @@ $db = new Object('./database');
 //print_r($db->getObjects());
 
 $test2 = $db->object('test2');
+echo '&test2: ';
 print_r($test2);
 
+echo 'children: ';
 print_r($test2->getObjectIDs());
 
-var_dump($test2->create('oele'));
+$newname = 'oele'.rand(1, 99);
+echo 'create "'.$newname.'": ';
+var_dump($test2->create($newname));
 
-$oele = $test2->object('oele');
-var_dump($oele);
+$oele = $test2->object($newname);
+echo '&oele: ';
+print_r($oele);
 
 $oelesparent = $oele->parent(1);
-var_dump($oelesparent);
+echo '&oele\'s parent: ';
+print_r($oelesparent);
 
+echo '&oele\'s parent\'s children: ';
+print_r($oelesparent->getObjectIds());
 
 
