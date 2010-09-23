@@ -17,7 +17,11 @@ class Object {
 		}
 	}
 
-	function init() { }
+	function init() {}
+
+	function asArray() {
+		return (array)$this->data;
+	}
 
 	function getObjects() {
 		$raw = glob($this->dir().'/*.*');
@@ -45,14 +49,22 @@ class Object {
 		return $alt;
 	}
 
-	function set( $key, $value, $write = true ) {
-		$this->data[$key] = $value;
-		if ( $write ) {
+	function set( $key, $value = null, $write = true ) {
+		if ( 1 < func_count_args() ) {
+			$this->data[$key] = $value;
+			$this->unsaved = true;
+		}
+		else if ( is_object($key) && !is_a($key, __CLASS__) ) {
+			$this->data = array_merge($this->data, (array)$key);
+			$this->unsaved = true;
+		}
+		else if ( !is_scalar($key) ) {
+			$this->data = array_merge($this->data, (array)$key);
+			$this->unsaved = true;
+		}
+		if ( $write  && $this->unsaved ) {
 			$this->write();
 			$this->unsaved = false;
-		}
-		else {
-			$this->unsaved = true;
 		}
 		return $this;
 	}

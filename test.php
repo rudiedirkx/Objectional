@@ -1,5 +1,7 @@
 <pre><?php
 
+$fStart = microtime(1);
+
 require_once('inc.cls.object.php');
 
 $db = new Object('./database');
@@ -27,6 +29,7 @@ echo '&oele\'s parent: ';
 print_r($oelesparent);
 
 echo '&oele\'s parent\'s children: ';
-print_r($oelesparent->getObjectIds());
+print_r($oelesparent->getObjects());
 
 
+echo "\n".number_format(microtime(1)-$fStart, 4)." s\n";
