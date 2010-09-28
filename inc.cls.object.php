@@ -23,8 +23,9 @@ class Object {
 		return (array)$this->data;
 	}
 
-	function getObjects() {
-		$raw = glob($this->dir().'/*.*');
+	function getObjects( $types = array() ) {
+		$types = $types ? '['.implode('|', (array)$types).']' : '*';
+		$raw = glob($this->dir().'/*.'.$types);
 		$objects = array();
 		foreach ( $raw AS $obj ) {
 			$objects[ self::__id($obj) ] = self::__object($obj, $this->__root);
@@ -32,14 +33,29 @@ class Object {
 		return $objects;
 	}
 
-	function getObjectIDs( $sort = true ) {
-		$objects = glob($this->dir().'/*.*');
+	function getObjectIDs( $types = array(), $sort = false ) {
+		$types = $types ? '['.implode('|', (array)$types).']' : '*';
+		$objects = glob($this->dir().'/*.'.$types);
 		$objects = array_map(array(__CLASS__, '__id'), $objects);
 		if ( $sort ) {
 			natcasesort($objects);
 			$objects = array_values($objects);
 		}
 		return $objects;
+	}
+
+	function getObjectByPath( $path ) {
+		if ( '/' == substr($path, 0, 1) ) {
+			$path = $this->__root . $path;
+		}
+		else {
+			$path = $this->__path.'/'.$path;
+		}
+		$find = glob($path.'.*');
+		if ( $find ) {
+			return self::__object($find[0], $this->__root);
+		}
+		return false;
 	}
 
 	function get( $key, $alt = null ) {
@@ -130,7 +146,7 @@ class Object {
 			return $this->extend(unserialize(file_get_contents($object)));
 		}
 		if ( !is_scalar($object) ) {
-			$this->data = $object;
+			$this->data = (array)$object;
 #			foreach ( $object AS $k => $v ) {
 #				$this->$k = $v;
 #			}
