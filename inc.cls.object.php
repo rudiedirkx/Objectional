@@ -80,7 +80,6 @@ class Object {
 	}
 
 	function create( $id, $type = __CLASS__ ) {
-		$type = __CLASS__;
 		$type = strtolower($type);
 		if ( $this->object($id) ) {
 			return false;
