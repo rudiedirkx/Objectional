@@ -36,7 +36,7 @@ var_dump($object);
 		echo '<fieldset><legend>Add/update property</legend>';
 		echo '<p>Type:<br><select name=addtype>'.implode(array_map(create_function('$t', 'return "<option value=\"".$t."\">".$t."</option>";'), $_types)).'</select></p>';
 		echo '<p>Name:<br><input name=addkey></p>';
-		echo '<p>Value:<br><textarea name=addvalue></textarea></p>';
+		echo '<p>Value:<br><textarea name=addvalue id=addvalue></textarea> (<a href="#" onclick="try{alert(\'You\\\'re good: \'+JSON.parse(document.getElementById(\'addvalue\').value));}catch(ex){alert(\'Invalid JSON: \'+ex.message);}return false;">verify json</a>)</p>';
 		echo '<p><input type=submit></p>';
 		echo '</fieldset>';
 		echo '</form>';
@@ -46,13 +46,19 @@ var_dump($object);
 }
 
 $children = getRecursiveChildren($db);
-print_r($children);
+printRecursiveChildren($children);
 
-
+function printRecursiveChildren( $list ) {
+	echo '<ul>';
+	foreach ( $list AS $id => $children ) {
+		echo '<li><a href="?id='.urlencode($id).'">'.ltrim($id, '/')."</a>".( ($c=count($children)) ? " (".$c.")" : '' )."</li>";
+		printRecursiveChildren($children);
+	}
+	echo '</ul>';
+}
 function getRecursiveChildren( $parent, $pre = '/' ) {
 	$children = array();
 	foreach ( $parent->getObjects() AS $id => $obj ) {
-echo '<a href="?id='.urlencode($pre.$id).'">'.$pre.$id."</a>\n";
 		$children[$pre.$id] = getRecursiveChildren($obj, $pre.$id.'/');
 	}
 	return $children;
