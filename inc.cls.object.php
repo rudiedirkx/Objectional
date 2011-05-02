@@ -1,10 +1,10 @@
 <?php
 
 class Object {
-	public $__path;
-	public $__root;
-	public $data = array();
-	public $unsaved = false;
+	protected $__path;
+	protected $__root;
+	protected $data = array();
+	protected $unsaved = false;
 	function __construct( $path, $root = false ) {
 		$this->__path = realpath($path);
 		if ( $root ) {
@@ -66,7 +66,7 @@ class Object {
 	}
 
 	function set( $key, $value = null, $write = true ) {
-		if ( 1 < func_count_args() ) {
+		if ( 1 < func_num_args() ) {
 			$this->data[$key] = $value;
 			$this->unsaved = true;
 		}
@@ -160,7 +160,7 @@ class Object {
 	}
 
 	static function __object($o, $root) {
-		list($id, $type) = basename($o);
+		list($id, $type) = explode('.', basename($o).'.');
 		$class = class_exists($type) ? $type : __CLASS__;
 		return new $class($o, $root);
 	}
