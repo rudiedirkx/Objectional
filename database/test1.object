@@ -1,1 +1,1 @@
-a:5:{s:5:"votes";i:14;s:3:"avg";d:7.30999999999999960920149533194489777088165283203125;s:10:"last_voter";s:5:"Japie";s:14:"last_vote_date";s:10:"2011-01-02";s:10:"is_enabled";b:1;}
+a:6:{s:5:"votes";i:14;s:3:"avg";d:7.30999999999999960920149533194489777088165283203125;s:10:"last_voter";s:5:"Japie";s:14:"last_vote_date";s:10:"2011-01-02";s:10:"is_enabled";b:1;s:3:"obj";O:8:"stdClass":1:{s:4:"oele";s:5:"boele";}}
